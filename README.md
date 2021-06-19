@@ -11,6 +11,8 @@
     -   [Franchise detail](#franchise-detail)
 -   [Reading data from the National Hockey League’s (NHL) stat
     API](#reading-data-from-the-national-hockey-leagues-nhl-stat-api)
+-   [Wrapper function to access API
+    endpoints](#wrapper-function-to-access-api-endpoints)
 
 # Packages required to load and analyse the data
 
@@ -196,33 +198,52 @@ are matched in the database:
 
 # Reading data from the National Hockey League’s (NHL) stat API
 
-The following code gets the data about all teams from the NHL stats API:
-
-    get_NHL_stats <- function(TeamID){
-      if (TeamID %in% c(1:max(get_franchise_data()$mostRecentTeamId))){
-        if (missing(TeamID)){
-        prefix2_url <- "https://statsapi.web.nhl.com/api/v1/teams/"
-        get_NHL_stats_url <- paste0(prefix2_url,"/","?expand=team.roster")
-        get_NHL_stats_list <- get_NHL_stats__url %>% GET() %>% content(.,"text") %>% fromJSON(.,flatten = TRUE)
-      
-      
-      return(get_NHL_stats_list$data)
-      
-    } else {
-        prefix2_url <- "https://statsapi.web.nhl.com/api/v1/teams/"
-        get_NHL_stats_url <- paste0(prefix2_url,TeamID,"/","?expand=team.roster")
-        get_NHL_stats_list <- get_NHL_stats__url %>% GET() %>% content(.,"text") %>% fromJSON(.,flatten = TRUE)
-      
-      
-      return(get_NHL_stats_list$data)
-       }
-      }   
-      }
-
 The following code gets the data about individual teams from the NHL
 stats API when the **mostRecentTeamId** is provided:
 
     get_single_team_stat <- function(ID){
       get_single_team_stat_url <- paste("https://statsapi.web.nhl.com/api/v1/teams/",ID,"/","?expand=team.stat",sep = "")
       get_single_team_stat_url %>% GET() %>% content(.,"text") %>% fromJSON(.,flatten = TRUE) %>% as.data.frame() %>% paged_table()
+    }
+
+# Wrapper function to access API endpoints
+
+The wrapper function is called \`get\_NHL\_info. The choice of endpoint
+selections are any of:
+
+-   Franchise data
+-   Franchise team totals
+-   Franchise season records (needs a franchise ID to return data for a
+    single team)
+-   Franchise goalie records (needs a franchise ID to return data for a
+    single team)
+-   Franchise skater records (needs a franchise ID to return data for a
+    single team)
+-   Franchise detail (needs a team ID to return data for a single team)
+-   Single team stat (needs a team ID to return data for a single team)
+
+The franchise ID must be between 1 and 39, and the team ID must be
+between 1 and 55 or an error message will be generated.
+
+Please refer to [NHL records
+API](https://gitlab.com/dword4/nhlapi/-/blob/master/records-api.md) for
+a clear explanation of the purpose of the API endpoints.
+
+    get_NHL_info<- function(endpoint,ID){
+
+      if(endpoint == "Franchise data"){
+       Franchises <- get_franchise_data()
+      } else if (endpoint == "Franchise team totals"){
+        franchise_totals <- get_franchise_team_totals()
+      } else if (endpoint == "Franchise season records"){
+        season_records <- get_franchise_season_records(ID) 
+      } else if (endpoint == "Franchise goalie records"){
+       goalie_records <- get_franchise_goalie_records (ID)
+      } else if (endpoint == "Franchise skater records"){
+       skater_records <-  get_franchise_skater_records (ID) 
+      } else if (endpoint == "Franchise detail"){
+       franchise_detail <-  get_franchise_detail (ID)
+       
+    }
+
     }
