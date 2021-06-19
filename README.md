@@ -22,7 +22,7 @@
 
 The following packages are needed for reading and analyzing the data:
 
-    packages <- c("tidyverse","httr","jsonlite","rmarkdown", "knitr","DT")
+    packages <- c("tidyverse","httr","jsonlite","rmarkdown", "knitr","DT","kableExtra")
     lapply(packages, library, character.only = TRUE)
 
 # Introduction
@@ -267,51 +267,368 @@ Dallas Stars:
     kable(table(skater_records$activePlayer, skater_records$positionCode),caption = "Summary of Dallas Stars Players by position and activity")
 
 <table>
-<caption>Summary of Dallas Stars Players by position and activity</caption>
+<caption>
+Summary of Dallas Stars Players by position and activity
+</caption>
 <thead>
-<tr class="header">
-<th style="text-align: left;"></th>
-<th style="text-align: right;">C</th>
-<th style="text-align: right;">D</th>
-<th style="text-align: right;">L</th>
-<th style="text-align: right;">R</th>
+<tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:right;">
+C
+</th>
+<th style="text-align:right;">
+D
+</th>
+<th style="text-align:right;">
+L
+</th>
+<th style="text-align:right;">
+R
+</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td style="text-align: left;">Inactive</td>
-<td style="text-align: right;">137</td>
-<td style="text-align: right;">183</td>
-<td style="text-align: right;">125</td>
-<td style="text-align: right;">115</td>
+<tr>
+<td style="text-align:left;">
+Inactive
+</td>
+<td style="text-align:right;">
+137
+</td>
+<td style="text-align:right;">
+183
+</td>
+<td style="text-align:right;">
+125
+</td>
+<td style="text-align:right;">
+115
+</td>
 </tr>
-<tr class="even">
-<td style="text-align: left;">Active</td>
-<td style="text-align: right;">16</td>
-<td style="text-align: right;">23</td>
-<td style="text-align: right;">9</td>
-<td style="text-align: right;">11</td>
+<tr>
+<td style="text-align:left;">
+Active
+</td>
+<td style="text-align:right;">
+16
+</td>
+<td style="text-align:right;">
+23
+</td>
+<td style="text-align:right;">
+9
+</td>
+<td style="text-align:right;">
+11
+</td>
 </tr>
 </tbody>
 </table>
 
-Summary of Dallas Stars Players by position and activity
-
 The table below summarize the home and away records for all teams during
-regular season:
+regular season. Only the first few rows are shown:
 
     team_totals <- get_franchise_team_totals()
-    datatable(team_totals %>% filter(gameTypeId==2) %>% select(teamName,starts_with("home"),starts_with("road")))
+    kable(head(team_totals %>% filter(gameTypeId==2) %>% select(teamName,starts_with("home"),starts_with("road"))))
 
-<div id="htmlwidget-89e737f3859102a73850" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-89e737f3859102a73850">{"x":{"filter":"none","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57"],["New Jersey Devils","New York Islanders","New York Rangers","Philadelphia Flyers","Pittsburgh Penguins","Boston Bruins","Buffalo Sabres","Montréal Canadiens","Ottawa Senators","Toronto Maple Leafs","Atlanta Thrashers","Carolina Hurricanes","Florida Panthers","Tampa Bay Lightning","Washington Capitals","Chicago Blackhawks","Detroit Red Wings","Nashville Predators","St. Louis Blues","Calgary Flames","Colorado Avalanche","Edmonton Oilers","Vancouver Canucks","Anaheim Ducks","Dallas Stars","Los Angeles Kings","Phoenix Coyotes","San Jose Sharks","Columbus Blue Jackets","Minnesota Wild","Minnesota North Stars","Quebec Nordiques","Winnipeg Jets (1979)","Hartford Whalers","Colorado Rockies","Ottawa Senators (1917)","Hamilton Tigers","Pittsburgh Pirates","Philadelphia Quakers","Detroit Cougars","Montreal Wanderers","Quebec Bulldogs","Montreal Maroons","New York Americans","St. Louis Eagles","Oakland Seals","Atlanta Flames","Kansas City Scouts","Cleveland Barons","Detroit Falcons","Brooklyn Americans","Winnipeg Jets","Arizona Coyotes","Vegas Golden Knights","California Golden Seals","Toronto Arenas","Toronto St. Patricks"],[525,678,1143,584,683,960,639,881,413,1082,204,323,390,414,620,1128,940,282,674,508,327,587,736,359,314,776,249,407,300,243,391,245,274,297,115,81,30,55,17,42,2,8,107,154,14,46,104,44,34,10,12,136,120,38,100,5,37],[85,84,76,93,60,92,84,95,93,85,38,77,115,67,83,86,99,73,72,69,62,74,84,82,81,71,48,84,77,84,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,33,30,13,null,null,null],[96,170,448,193,205,376,197,381,60,388,26,52,65,56,153,410,368,34,218,135,55,125,210,58,65,211,43,58,18,28,163,83,88,95,47,30,0,10,2,11,0,0,48,67,3,23,53,16,18,11,2,null,null,null,52,0,5],[790,963,1614,1216,1138,1885,1053,2038,533,1702,183,453,485,559,959,1655,1741,477,1122,863,543,830,943,557,594,1027,340,589,390,429,477,300,307,318,78,160,33,41,3,35,1,4,156,147,7,44,161,20,28,25,10,207,116,96,84,15,73],[686,909,1573,868,1051,1443,925,1421,527,1614,233,402,480,533,847,1633,1506,374,971,728,401,750,1010,475,424,1053,297,513,398,356,579,354,386,412,166,140,48,67,19,45,3,12,153,219,17,72,156,66,53,31,17,156,142,56,183,17,74],[84,82,77,90,91,99,83,80,76,89,40,97,93,83,80,87,84,90,95,81,80,93,75,98,81,94,57,79,82,70,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,42,30,11,null,null,null],[123,177,360,264,178,415,212,456,55,385,19,34,77,56,150,404,405,26,214,136,46,137,181,49,60,213,51,63,15,27,171,77,84,82,39,33,1,13,2,14,0,0,43,57,3,19,55,7,8,6,1,null,null,null,21,0,5],[604,725,1269,863,765,1356,752,1435,438,1171,159,374,404,426,741,1157,1150,375,807,634,464,639,706,433,490,727,275,481,288,330,281,197,199,216,35,98,14,26,1,29,0,0,115,92,4,22,107,7,19,9,6,175,98,77,32,3,36]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>teamName<\/th>\n      <th>homeLosses<\/th>\n      <th>homeOvertimeLosses<\/th>\n      <th>homeTies<\/th>\n      <th>homeWins<\/th>\n      <th>roadLosses<\/th>\n      <th>roadOvertimeLosses<\/th>\n      <th>roadTies<\/th>\n      <th>roadWins<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[2,3,4,5,6,7,8,9]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+teamName
+</th>
+<th style="text-align:right;">
+homeLosses
+</th>
+<th style="text-align:right;">
+homeOvertimeLosses
+</th>
+<th style="text-align:right;">
+homeTies
+</th>
+<th style="text-align:right;">
+homeWins
+</th>
+<th style="text-align:right;">
+roadLosses
+</th>
+<th style="text-align:right;">
+roadOvertimeLosses
+</th>
+<th style="text-align:right;">
+roadTies
+</th>
+<th style="text-align:right;">
+roadWins
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+New Jersey Devils
+</td>
+<td style="text-align:right;">
+525
+</td>
+<td style="text-align:right;">
+85
+</td>
+<td style="text-align:right;">
+96
+</td>
+<td style="text-align:right;">
+790
+</td>
+<td style="text-align:right;">
+686
+</td>
+<td style="text-align:right;">
+84
+</td>
+<td style="text-align:right;">
+123
+</td>
+<td style="text-align:right;">
+604
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+New York Islanders
+</td>
+<td style="text-align:right;">
+678
+</td>
+<td style="text-align:right;">
+84
+</td>
+<td style="text-align:right;">
+170
+</td>
+<td style="text-align:right;">
+963
+</td>
+<td style="text-align:right;">
+909
+</td>
+<td style="text-align:right;">
+82
+</td>
+<td style="text-align:right;">
+177
+</td>
+<td style="text-align:right;">
+725
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+New York Rangers
+</td>
+<td style="text-align:right;">
+1143
+</td>
+<td style="text-align:right;">
+76
+</td>
+<td style="text-align:right;">
+448
+</td>
+<td style="text-align:right;">
+1614
+</td>
+<td style="text-align:right;">
+1573
+</td>
+<td style="text-align:right;">
+77
+</td>
+<td style="text-align:right;">
+360
+</td>
+<td style="text-align:right;">
+1269
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Philadelphia Flyers
+</td>
+<td style="text-align:right;">
+584
+</td>
+<td style="text-align:right;">
+93
+</td>
+<td style="text-align:right;">
+193
+</td>
+<td style="text-align:right;">
+1216
+</td>
+<td style="text-align:right;">
+868
+</td>
+<td style="text-align:right;">
+90
+</td>
+<td style="text-align:right;">
+264
+</td>
+<td style="text-align:right;">
+863
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pittsburgh Penguins
+</td>
+<td style="text-align:right;">
+683
+</td>
+<td style="text-align:right;">
+60
+</td>
+<td style="text-align:right;">
+205
+</td>
+<td style="text-align:right;">
+1138
+</td>
+<td style="text-align:right;">
+1051
+</td>
+<td style="text-align:right;">
+91
+</td>
+<td style="text-align:right;">
+178
+</td>
+<td style="text-align:right;">
+765
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Boston Bruins
+</td>
+<td style="text-align:right;">
+960
+</td>
+<td style="text-align:right;">
+92
+</td>
+<td style="text-align:right;">
+376
+</td>
+<td style="text-align:right;">
+1885
+</td>
+<td style="text-align:right;">
+1443
+</td>
+<td style="text-align:right;">
+99
+</td>
+<td style="text-align:right;">
+415
+</td>
+<td style="text-align:right;">
+1356
+</td>
+</tr>
+</tbody>
+</table>
 
 The following table shows home win percentage and road win percentage
-for all teams during regular season:
+for all teams during regular season. Only the first few rows are shown:
 
     regular_season_records <- team_totals %>% filter(gameTypeId==2) %>% select(teamName,starts_with("home"),starts_with("road"))
     regular_season_win_percent <-regular_season_records %>%  mutate(HomeWinPercent=(homeWins/(homeTies+homeLosses)),roadWinPercent=(roadWins/(roadTies+roadLosses))) %>% select(teamName,HomeWinPercent,roadWinPercent)
-    datatable(regular_season_win_percent, caption = "Home and away win percentages during regular season") %>% formatRound(c("HomeWinPercent","roadWinPercent"),digits=2)
+    kable(head(regular_season_win_percent, caption = "Home and away win percentages during regular season",digits = 2))
 
-<div id="htmlwidget-fd5b10818cd81c67c436" style="width:100%;height:auto;" class="datatables html-widget"></div>
-<script type="application/json" data-for="htmlwidget-fd5b10818cd81c67c436">{"x":{"filter":"none","caption":"<caption>Home and away win percentages during regular season<\/caption>","data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28","29","30","31","32","33","34","35","36","37","38","39","40","41","42","43","44","45","46","47","48","49","50","51","52","53","54","55","56","57"],["New Jersey Devils","New York Islanders","New York Rangers","Philadelphia Flyers","Pittsburgh Penguins","Boston Bruins","Buffalo Sabres","Montréal Canadiens","Ottawa Senators","Toronto Maple Leafs","Atlanta Thrashers","Carolina Hurricanes","Florida Panthers","Tampa Bay Lightning","Washington Capitals","Chicago Blackhawks","Detroit Red Wings","Nashville Predators","St. Louis Blues","Calgary Flames","Colorado Avalanche","Edmonton Oilers","Vancouver Canucks","Anaheim Ducks","Dallas Stars","Los Angeles Kings","Phoenix Coyotes","San Jose Sharks","Columbus Blue Jackets","Minnesota Wild","Minnesota North Stars","Quebec Nordiques","Winnipeg Jets (1979)","Hartford Whalers","Colorado Rockies","Ottawa Senators (1917)","Hamilton Tigers","Pittsburgh Pirates","Philadelphia Quakers","Detroit Cougars","Montreal Wanderers","Quebec Bulldogs","Montreal Maroons","New York Americans","St. Louis Eagles","Oakland Seals","Atlanta Flames","Kansas City Scouts","Cleveland Barons","Detroit Falcons","Brooklyn Americans","Winnipeg Jets","Arizona Coyotes","Vegas Golden Knights","California Golden Seals","Toronto Arenas","Toronto St. Patricks"],[1.27214170692432,1.13561320754717,1.0144563167819,1.56499356499356,1.28153153153153,1.41092814371257,1.25956937799043,1.6148969889065,1.12684989429175,1.1578231292517,0.795652173913043,1.208,1.06593406593407,1.18936170212766,1.24062095730919,1.07607282184655,1.33103975535168,1.50949367088608,1.25784753363229,1.34214618973561,1.42146596858639,1.16573033707865,0.996828752642706,1.33573141486811,1.56728232189974,1.04052684903749,1.16438356164384,1.26666666666667,1.22641509433962,1.5830258302583,0.86101083032491,0.914634146341463,0.848066298342541,0.811224489795918,0.481481481481481,1.44144144144144,1.1,0.630769230769231,0.157894736842105,0.660377358490566,0.5,0.5,1.00645161290323,0.665158371040724,0.411764705882353,0.63768115942029,1.02547770700637,0.333333333333333,0.538461538461538,1.19047619047619,0.714285714285714,null,null,null,0.552631578947368,3,1.73809523809524],[0.746600741656366,0.667587476979742,0.656492498706674,0.762367491166078,0.622457282343369,0.729817007534984,0.661389621811785,0.764517847629196,0.752577319587629,0.585792896448224,0.630952380952381,0.857798165137615,0.725314183123878,0.723259762308998,0.743229689067202,0.567992145311733,0.601779173207745,0.9375,0.681012658227848,0.733796296296296,1.03803131991051,0.720405862457723,0.592779177162049,0.826335877862595,1.01239669421488,0.574249605055292,0.790229885057471,0.835069444444444,0.697336561743341,0.861618798955614,0.374666666666667,0.45707656612529,0.423404255319149,0.437246963562753,0.170731707317073,0.566473988439306,0.285714285714286,0.325,0.0476190476190476,0.491525423728814,0,0,0.586734693877551,0.333333333333333,0.2,0.241758241758242,0.507109004739337,0.0958904109589041,0.311475409836066,0.243243243243243,0.333333333333333,null,null,null,0.156862745098039,0.176470588235294,0.455696202531646]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>teamName<\/th>\n      <th>HomeWinPercent<\/th>\n      <th>roadWinPercent<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"targets":2,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\");\n  }"},{"targets":3,"render":"function(data, type, row, meta) {\n    return type !== 'display' ? data : DTWidget.formatRound(data, 2, 3, \",\", \".\");\n  }"},{"className":"dt-right","targets":[2,3]},{"orderable":false,"targets":0}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":["options.columnDefs.0.render","options.columnDefs.1.render"],"jsHooks":[]}</script>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+teamName
+</th>
+<th style="text-align:right;">
+HomeWinPercent
+</th>
+<th style="text-align:right;">
+roadWinPercent
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+New Jersey Devils
+</td>
+<td style="text-align:right;">
+1.272142
+</td>
+<td style="text-align:right;">
+0.7466007
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+New York Islanders
+</td>
+<td style="text-align:right;">
+1.135613
+</td>
+<td style="text-align:right;">
+0.6675875
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+New York Rangers
+</td>
+<td style="text-align:right;">
+1.014456
+</td>
+<td style="text-align:right;">
+0.6564925
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Philadelphia Flyers
+</td>
+<td style="text-align:right;">
+1.564994
+</td>
+<td style="text-align:right;">
+0.7623675
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Pittsburgh Penguins
+</td>
+<td style="text-align:right;">
+1.281532
+</td>
+<td style="text-align:right;">
+0.6224573
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Boston Bruins
+</td>
+<td style="text-align:right;">
+1.410928
+</td>
+<td style="text-align:right;">
+0.7298170
+</td>
+</tr>
+</tbody>
+</table>
