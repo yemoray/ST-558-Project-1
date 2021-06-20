@@ -16,17 +16,22 @@
 -   [Exploratory Data Analysis](#exploratory-data-analysis)
     -   [Data from 2 endpoints](#data-from-2-endpoints)
         -   [Some data for active and inactive players of the Dallas
-            Stars:](#some-data-for-active-and-inactive-players-of-the-dallas-stars)
+            Stars](#some-data-for-active-and-inactive-players-of-the-dallas-stars)
         -   [Home and away records for all teams during regular
-            season:](#home-and-away-records-for-all-teams-during-regular-season)
+            season](#home-and-away-records-for-all-teams-during-regular-season)
+    -   [Creation of new variables](#creation-of-new-variables)
     -   [Contingency table](#contingency-table)
         -   [Summary of active and inactive players for the Dallas
-            Stars:](#summary-of-active-and-inactive-players-for-the-dallas-stars)
+            Stars](#summary-of-active-and-inactive-players-for-the-dallas-stars)
     -   [Numerical Summaries](#numerical-summaries)
         -   [Summary of assists by position for the Dallas
-            Stars:](#summary-of-assists-by-position-for-the-dallas-stars)
+            Stars](#summary-of-assists-by-position-for-the-dallas-stars)
         -   [Summary of penalty minutes by position for the Dallas
-            Stars:](#summary-of-penalty-minutes-by-position-for-the-dallas-stars)
+            Stars](#summary-of-penalty-minutes-by-position-for-the-dallas-stars)
+    -   [Graphics](#graphics)
+        -   [Graph of regular season home win percent vs playoff home
+            win
+            percent](#graph-of-regular-season-home-win-percent-vs-playoff-home-win-percent)
 
 # Packages required to load and analyse the data
 
@@ -266,7 +271,7 @@ a clear explanation of the purpose of the API endpoints.
 
 ## Data from 2 endpoints
 
-### Some data for active and inactive players of the Dallas Stars:
+### Some data for active and inactive players of the Dallas Stars
 
 The table below shows some data for active and inactive players for the
 Dallas Stars, only the first few rows are shown, to conserve space:
@@ -422,7 +427,7 @@ D
 </tbody>
 </table>
 
-### Home and away records for all teams during regular season:
+### Home and away records for all teams during regular season
 
 The table below summarize the home and away records for all teams during
 regular season. Only the first few rows are shown:
@@ -640,11 +645,13 @@ Boston Bruins
 </tbody>
 </table>
 
+## Creation of new variables
+
 The following table shows home win percentage and road win percentage
 for all teams during regular season. Only the first few rows are shown:
 
     regular_season_records <- team_totals %>% filter(gameTypeId==2) %>% select(teamName,starts_with("home"),starts_with("road"))
-    regular_season_win_percent <-regular_season_records %>%  mutate(HomeWinPercent=(homeWins/(homeTies+homeLosses)),roadWinPercent=(roadWins/(roadTies+roadLosses))) %>% select(teamName,HomeWinPercent,roadWinPercent)
+    regular_season_win_percent <-regular_season_records %>%  mutate(HomeWinPercent=(homeWins/(homeWins+homeTies+homeLosses)),roadWinPercent=(roadWins/(roadWins+roadTies+roadLosses))) %>% select(teamName,HomeWinPercent,roadWinPercent)
     kable(head(regular_season_win_percent, caption = "Home and away win percentages during regular season"),digits = 2)
 
 <table>
@@ -667,10 +674,10 @@ roadWinPercent
 New Jersey Devils
 </td>
 <td style="text-align:right;">
-1.27
+0.56
 </td>
 <td style="text-align:right;">
-0.75
+0.43
 </td>
 </tr>
 <tr>
@@ -678,10 +685,10 @@ New Jersey Devils
 New York Islanders
 </td>
 <td style="text-align:right;">
-1.14
+0.53
 </td>
 <td style="text-align:right;">
-0.67
+0.40
 </td>
 </tr>
 <tr>
@@ -689,10 +696,10 @@ New York Islanders
 New York Rangers
 </td>
 <td style="text-align:right;">
-1.01
+0.50
 </td>
 <td style="text-align:right;">
-0.66
+0.40
 </td>
 </tr>
 <tr>
@@ -700,10 +707,10 @@ New York Rangers
 Philadelphia Flyers
 </td>
 <td style="text-align:right;">
-1.56
+0.61
 </td>
 <td style="text-align:right;">
-0.76
+0.43
 </td>
 </tr>
 <tr>
@@ -711,10 +718,10 @@ Philadelphia Flyers
 Pittsburgh Penguins
 </td>
 <td style="text-align:right;">
-1.28
+0.56
 </td>
 <td style="text-align:right;">
-0.62
+0.38
 </td>
 </tr>
 <tr>
@@ -722,18 +729,33 @@ Pittsburgh Penguins
 Boston Bruins
 </td>
 <td style="text-align:right;">
-1.41
+0.59
 </td>
 <td style="text-align:right;">
-0.73
+0.42
 </td>
 </tr>
 </tbody>
 </table>
 
+The same records for playoffs were also calculated and will be displayed
+in a graph.
+
+    playoff_records <- team_totals %>% filter(gameTypeId==3) %>% select(teamName,starts_with("home"),starts_with("road"))
+    playoff_win_percent <-playoff_records %>%  mutate(HomeWinPercent=(homeWins/(homeWins+homeTies+homeLosses)),roadWinPercent=(roadWins/(roadWins+roadTies+roadLosses))) %>% select(teamName,HomeWinPercent,roadWinPercent)
+    kable(head(playoff_win_percent, caption = "Home and away win percentages during playoffs"),digits = 2)
+
+The regular season records and playoff records data frames are merged
+below prior to graphic representation. Some columns are renamed first,
+also rows with missing records are removed:
+
+    playoff_win_percent_rn <- playoff_win_percent  %>%  rename(HomeWinPercent_po=HomeWinPercent, roadWinPercent_po=roadWinPercent) %>% tbl_df()
+    regular_season_win_percent_rn <- regular_season_win_percent  %>%  rename(HomeWinPercent_rs=HomeWinPercent, roadWinPercent_rs=roadWinPercent) %>% tbl_df()
+    win_percent_join <- full_join(playoff_win_percent_rn,regular_season_win_percent_rn, by = "teamName") %>% drop_na()
+
 ## Contingency table
 
-### Summary of active and inactive players for the Dallas Stars:
+### Summary of active and inactive players for the Dallas Stars
 
 The table below summarizes an earlier table, it shows the number of
 currently active and inactive players for the Dallas Stars:
@@ -804,7 +826,7 @@ Active
 
 ## Numerical Summaries
 
-### Summary of assists by position for the Dallas Stars:
+### Summary of assists by position for the Dallas Stars
 
 The table below shows that, not, surprisingly, the centers provided the
 most assists on average.
@@ -829,9 +851,9 @@ most assists on average.
     ## 
     ## Table: Numeric Summaries of Dallas Stars assists by Position
 
-### Summary of penalty minutes by position for the Dallas Stars:
+### Summary of penalty minutes by position for the Dallas Stars
 
-The table below shows that the wingers spend the most time in the
+The table below shows that the centers spend the least time in the
 penalty box on average.
 
     penalty_record  <-  skater_records %>% group_by(positionCode) %>%select(penaltyMinutes) %>% descr(.,stats = "common")
@@ -853,3 +875,61 @@ penalty box on average.
     ##       Pct.Valid             100.00             100.00             100.00             100.00
     ## 
     ## Table: Numeric Summaries of Dallas Stars penalty minutes by Position
+
+## Graphics
+
+### Graph of regular season home win percent vs playoff home win percent
+
+It appears that, overall, teams that perform well at home during the
+regular season do as well during the playoffs.
+
+    ggplot(data=win_percent_join, aes(y=HomeWinPercent_rs, x=HomeWinPercent_po))+
+      geom_point(color="green")+
+      geom_abline(slope=1, intercept = 0, color="blue")+
+      labs(x="Playoff Home Wins", y="Regular Season Home Wins", title="Scatter of Regular Season vs Playoffs Home Wins")
+
+![](README_files/figure-markdown_strict/unnamed-chunk-50-1.png)
+
+The boxplot below is a visual representation of the numerical summaries
+table for penalty minutes shown earlier. This also shows
+that,unsurprisingly, centers spend the least time in the penalty box.
+
+    skater_records$avgPenaltyMinutes = skater_records$penaltyMinutes / skater_records$gamesPlayed
+
+    ggplot(data=skater_records%>%filter(gameTypeId==2), aes(x=positionCode, y=avgPenaltyMinutes))+
+      geom_boxplot(aes(fill=positionCode))+
+      geom_jitter()+
+      labs(x="Position", y="Average Penalty Minutes Per Game", fill="Position", title = "Boxplot of Average Penalty Minutes by Position for the Dallas Stars")
+
+![](README_files/figure-markdown_strict/unnamed-chunk-51-1.png)
+
+The bar plot below show the goals scored by position by the Dallas Stars
+team. The centers clearly score the most goals for the Dallas Stars.
+
+    ggplot(data=skater_records, aes(x=positionCode, y=points))+
+      geom_bar(stat = "identity", aes(fill=positionCode))+
+      labs(x="Position", y="Points", fill="Position", title="Points scored by position for the Dallas Stars")
+
+![](README_files/figure-markdown_strict/unnamed-chunk-52-1.png)
+
+The home win percent vs road win percent shown in an earlier table are
+visualized in the scatterplot below. It seems home advantage counts for
+little for the Dallas Stars.
+
+    ggplot(data=regular_season_win_percent, aes(y=HomeWinPercent, x=roadWinPercent))+
+      geom_point(color="red")+ geom_smooth(method = "lm")+ 
+      geom_abline(slope=1, intercept = 0, color="green")+
+      labs(x="Road Wins %", y="Home Wins %", title="Scatterplot of Away vs Home Wins Percentages")
+
+![](README_files/figure-markdown_strict/unnamed-chunk-53-1.png)
+
+The histogram below shows the distribution of seasons spent by position
+for the Dallas Stars.The majority of players spent less than 5 seasons,
+but it seems defenders tend to spend longer at the Dallas Stars.
+
+    ggplot(data=skater_records, aes(x=seasons, y=..density..))+
+      geom_histogram(aes(fill=activePlayer), position = "dodge")+
+      facet_wrap(~positionCode)+
+      labs(x="Seasons", y="Count", title = "Distribution of seasons by Position for the Dallas Stars", fill="Active Player")
+
+![](README_files/figure-markdown_strict/unnamed-chunk-54-1.png)
