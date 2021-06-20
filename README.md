@@ -33,6 +33,8 @@
             win
             percent](#graph-of-regular-season-home-win-percent-vs-playoff-home-win-percent)
 
+    knitr::opts_chunk$set(fig.path='Figs/')
+
 # Packages required to load and analyse the data
 
 The following packages are needed for reading and analyzing the data:
@@ -888,7 +890,7 @@ regular season do as well during the playoffs.
       geom_abline(slope=1, intercept = 0, color="blue")+
       labs(x="Playoff Home Wins", y="Regular Season Home Wins", title="Scatter of Regular Season vs Playoffs Home Wins")
 
-![](README_files/figure-markdown_strict/unnamed-chunk-50-1.png)
+![](Figs/unnamed-chunk-19-1.png)
 
 The boxplot below is a visual representation of the numerical summaries
 table for penalty minutes shown earlier. This also shows
@@ -901,7 +903,7 @@ that,unsurprisingly, centers spend the least time in the penalty box.
       geom_jitter()+
       labs(x="Position", y="Average Penalty Minutes Per Game", fill="Position", title = "Boxplot of Average Penalty Minutes by Position for the Dallas Stars")
 
-![](README_files/figure-markdown_strict/unnamed-chunk-51-1.png)
+![](Figs/unnamed-chunk-20-1.png)
 
 The bar plot below show the goals scored by position by the Dallas Stars
 team. The centers clearly score the most goals for the Dallas Stars.
@@ -910,7 +912,7 @@ team. The centers clearly score the most goals for the Dallas Stars.
       geom_bar(stat = "identity", aes(fill=positionCode))+
       labs(x="Position", y="Points", fill="Position", title="Points scored by position for the Dallas Stars")
 
-![](README_files/figure-markdown_strict/unnamed-chunk-52-1.png)
+![](Figs/unnamed-chunk-21-1.png)
 
 The home win percent vs road win percent shown in an earlier table are
 visualized in the scatterplot below. It seems home advantage counts for
@@ -921,7 +923,7 @@ little for the Dallas Stars.
       geom_abline(slope=1, intercept = 0, color="green")+
       labs(x="Road Wins %", y="Home Wins %", title="Scatterplot of Away vs Home Wins Percentages")
 
-![](README_files/figure-markdown_strict/unnamed-chunk-53-1.png)
+![](Figs/unnamed-chunk-22-1.png)
 
 The histogram below shows the distribution of seasons spent by position
 for the Dallas Stars.The majority of players spent less than 5 seasons,
@@ -932,4 +934,4 @@ but it seems defenders tend to spend longer at the Dallas Stars.
       facet_wrap(~positionCode)+
       labs(x="Seasons", y="Count", title = "Distribution of seasons by Position for the Dallas Stars", fill="Active Player")
 
-![](README_files/figure-markdown_strict/unnamed-chunk-54-1.png)
+![](Figs/unnamed-chunk-23-1.png)
