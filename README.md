@@ -102,7 +102,7 @@ supplied, as long as they are matched in the database
       
         } else if  (name %in% get_franchise_data()$fullName)  {
             if  (ID != which(get_franchise_data()$fullName == name))  {
-              stop ("The franchise id entered is not for the team selected")
+              stop ("The franchise id entered is not for the team selected")       #This warns the user if there is a name and ID mismatch.
             }
             ID <- which(get_franchise_data()$fullName == name)
             prefix_url <- "https://records.nhl.com/site/api"
@@ -392,15 +392,30 @@ are matched in the database:
 
 # Reading data from the National Hockey League’s (NHL) stat API
 
-The following code gets the data about individual teams from the NHL
-stats API when the **mostRecentTeamId** is provided:
+The following code gets the data about individual teams, or all teams
+from the NHL stats API when the **mostRecentTeamId**, represented here
+as **TeamID**, is provided, or if “all” is used as the argument:
 
-    get_single_team_stat <- function(ID){
-      get_single_team_stat_url <- paste0("https://statsapi.web.nhl.com/api/v1/teams/",ID,"/","?expand=team.stat")
-      get_single_team_stat_url %>% 
-      GET() %>% content(.,"text") %>% 
-      fromJSON(.,flatten = TRUE) %>% 
-      as.data.frame() %>% paged_table()
+    get_team_stat <- function(TeamID){
+      if  (TeamID %in% c(1:max(get_franchise_data()$mostRecentTeamId)))  {
+        get_single_team_stat_url <- paste0("https://statsapi.web.nhl.com/api/v1/teams/",TeamID,"?expand=team.stats")
+        info <-  get_single_team_stat_url %>% 
+        GET() %>% content(.,"text") %>% 
+        fromJSON(.,flatten = TRUE) %>% 
+        as.data.frame() %>% tbl_df() 
+        info_full <- unnest(unnest(info,cols = c(teams.teamStats)),cols = c(splits))
+        return(info_full)
+        
+      }  else if (identical(TeamID, "all")){
+          get_single_team_stat_url <- "https://statsapi.web.nhl.com/api/v1/teams/?expand=team.stats"
+          info <-  get_single_team_stat_url %>% 
+          GET() %>% content(.,"text") %>% 
+          fromJSON(.,flatten = TRUE) %>% 
+          as.data.frame() %>% tbl_df() 
+          info_full <- unnest(unnest(info,cols = c(teams.teamStats)),cols = c(splits))
+          return(info_full)
+        }
+
     }
 
 # Wrapper function to access API endpoints
@@ -883,7 +898,7 @@ regular season do as well during the playoffs.
       geom_abline(slope=1, intercept = 0, color="blue")+
       labs(x="Playoff Home Wins", y="Regular Season Home Wins", title="Scatter of Regular Season vs Playoffs Home Wins")
 
-![](Figs/unnamed-chunk-64-1.png)
+![](Figs/unnamed-chunk-29-1.png)
 
 The boxplot below is a visual representation of the numerical summaries
 table for penalty minutes shown earlier. This also shows
@@ -896,7 +911,7 @@ that,unsurprisingly, centers spend the least time in the penalty box.
       geom_jitter()+
       labs(x="Position", y="Average Penalty Minutes Per Game", fill="Position", title = "Boxplot of Average Penalty Minutes by Position for the Dallas Stars")
 
-![](Figs/unnamed-chunk-65-1.png)
+![](Figs/unnamed-chunk-30-1.png)
 
 The bar plot below show the goals scored by position by the Dallas Stars
 team. The centers clearly score the most goals for the Dallas Stars.
@@ -905,7 +920,7 @@ team. The centers clearly score the most goals for the Dallas Stars.
       geom_bar(stat = "identity", aes(fill=positionCode))+
       labs(x="Position", y="Points", fill="Position", title="Points scored by position for the Dallas Stars")
 
-![](Figs/unnamed-chunk-66-1.png)
+![](Figs/unnamed-chunk-31-1.png)
 
 The bar plot below shows that teams that are very aggressive, also tend
 to have very good defensive solidity.
@@ -916,7 +931,7 @@ to have very good defensive solidity.
       scale_fill_discrete(name="Defensive Solidity", labels=c("Not defensive", "Slightly defensive", "Defensive","Very defensive")) + 
       coord_flip()
 
-![](Figs/unnamed-chunk-67-1.png)
+![](Figs/unnamed-chunk-32-1.png)
 
 The home win percent vs road win percent shown in an earlier table are
 visualized in the scatterplot below. It seems home advantage counts for
@@ -927,7 +942,7 @@ little..
       geom_abline(slope=1, intercept = 0, color="green")+
       labs(x="Road Wins %", y="Home Wins %", title="Scatterplot of Away vs Home Wins Percentages")
 
-![](Figs/unnamed-chunk-68-1.png)
+![](Figs/unnamed-chunk-33-1.png)
 
 The histogram below shows the distribution of seasons spent by position
 for the Dallas Stars.The majority of players spent less than 5 seasons,
@@ -938,4 +953,4 @@ but it seems defenders tend to spend longer at the Dallas Stars.
       facet_wrap(~positionCode)+
       labs(x="Seasons", y="Count", title = "Distribution of seasons by Position for the Dallas Stars", fill="Active Player")
 
-![](Figs/unnamed-chunk-69-1.png)
+![](Figs/unnamed-chunk-34-1.png)
