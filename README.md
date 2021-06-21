@@ -20,9 +20,12 @@
         -   [Home and away records for all teams during regular
             season](#home-and-away-records-for-all-teams-during-regular-season)
     -   [Creation of new variables](#creation-of-new-variables)
-    -   [Contingency table](#contingency-table)
+    -   [Contingency tables](#contingency-tables)
         -   [Summary of active and inactive players for the Dallas
             Stars](#summary-of-active-and-inactive-players-for-the-dallas-stars)
+        -   [Table comparing number of shut outs with time spent in the
+            penalty
+            box](#table-comparing-number-of-shut-outs-with-time-spent-in-the-penalty-box)
     -   [Numerical Summaries](#numerical-summaries)
         -   [Summary of assists by position for the Dallas
             Stars](#summary-of-assists-by-position-for-the-dallas-stars)
@@ -60,7 +63,9 @@ of every team in the history of the NHL.
     get_franchise_data <- function()  {
       prefix_url <- "https://records.nhl.com/site/api"
       franchise_url <- paste0(prefix_url,"/","franchise")
-      franchise_list <- franchise_url %>% GET() %>% content(.,"text") %>% fromJSON(.,flatten = TRUE)
+      franchise_list <- franchise_url %>% 
+                        GET() %>% 
+                        content(.,"text") %>% fromJSON(.,flatten = TRUE)
       
       return(franchise_list$data)
     }
@@ -72,7 +77,9 @@ The franchise team totals returns the total stats for every franchise:
     get_franchise_team_totals <- function()  {
       prefix_url <- "https://records.nhl.com/site/api"
       franchise_totals_url <- paste0(prefix_url,"/","franchise-team-totals")
-      franchise_totals_list <- franchise_totals_url %>% GET() %>% content(.,"text") %>% fromJSON(.,flatten = TRUE)
+      franchise_totals_list <- franchise_totals_url %>% 
+                                GET() %>%
+                                content(.,"text") %>% fromJSON(.,flatten = TRUE)
       
       return(franchise_totals_list$data)
     }
@@ -390,7 +397,10 @@ stats API when the **mostRecentTeamId** is provided:
 
     get_single_team_stat <- function(ID){
       get_single_team_stat_url <- paste0("https://statsapi.web.nhl.com/api/v1/teams/",ID,"/","?expand=team.stat")
-      get_single_team_stat_url %>% GET() %>% content(.,"text") %>% fromJSON(.,flatten = TRUE) %>% as.data.frame() %>% paged_table()
+      get_single_team_stat_url %>% 
+      GET() %>% content(.,"text") %>% 
+      fromJSON(.,flatten = TRUE) %>% 
+      as.data.frame() %>% paged_table()
     }
 
 # Wrapper function to access API endpoints
@@ -516,7 +526,9 @@ The table below summarize the home and away records for all teams during
 regular season. Only the first few rows are shown:
 
     team_totals <- get_franchise_team_totals()
-    kable(head(team_totals %>% filter(gameTypeId==2) %>% select(teamName,starts_with("home"),starts_with("road"))))
+    kable(head(team_totals %>% 
+         filter(gameTypeId==2) %>%
+         select(teamName,starts_with("home"),starts_with("road"))))
 
 <table>
 <colgroup>
@@ -618,8 +630,14 @@ regular season. Only the first few rows are shown:
 The following table shows home win percentage and road win percentage
 for all teams during regular season. Only the first few rows are shown:
 
-    regular_season_records <- team_totals %>% filter(gameTypeId==2) %>% select(teamName,starts_with("home"),starts_with("road"))
-    regular_season_win_percent <-regular_season_records %>%  mutate(HomeWinPercent=(homeWins/(homeWins+homeTies+homeLosses)),roadWinPercent=(roadWins/(roadWins+roadTies+roadLosses))) %>% select(teamName,HomeWinPercent,roadWinPercent)
+    regular_season_records <- team_totals %>% 
+                              filter(gameTypeId==2) %>% 
+                              select(teamName,starts_with("home"),starts_with("road"))
+
+    regular_season_win_percent <-regular_season_records %>% 
+                                 mutate(HomeWinPercent=(homeWins/(homeWins+homeTies+homeLosses)),roadWinPercent=(roadWins/(roadWins+roadTies+roadLosses))) %>% 
+                                 select(teamName,HomeWinPercent,roadWinPercent)
+
     kable(head(regular_season_win_percent, caption = "Home and away win percentages during regular season"),digits = 2)
 
 <table>
@@ -667,19 +685,29 @@ for all teams during regular season. Only the first few rows are shown:
 The same records for playoffs were also calculated and will be displayed
 in a graph.
 
-    playoff_records <- team_totals %>% filter(gameTypeId==3) %>% select(teamName,starts_with("home"),starts_with("road"))
-    playoff_win_percent <-playoff_records %>%  mutate(HomeWinPercent=(homeWins/(homeWins+homeTies+homeLosses)),roadWinPercent=(roadWins/(roadWins+roadTies+roadLosses))) %>% select(teamName,HomeWinPercent,roadWinPercent)
+    playoff_records <- team_totals %>% 
+                      filter(gameTypeId==3) %>% 
+                      select(teamName,starts_with("home"),starts_with("road"))
+
+    playoff_win_percent <-playoff_records %>% 
+                          mutate(HomeWinPercent=(homeWins/(homeWins+homeTies+homeLosses)),roadWinPercent=(roadWins/(roadWins+roadTies+roadLosses))) %>% 
+                          select(teamName,HomeWinPercent,roadWinPercent)
+
     kable(head(playoff_win_percent, caption = "Home and away win percentages during playoffs"),digits = 2)
 
 The regular season records and playoff records data frames are merged
 below prior to graphic representation. Some columns are renamed first,
 also rows with missing records are removed:
 
-    playoff_win_percent_rn <- playoff_win_percent  %>%  rename(HomeWinPercent_po=HomeWinPercent, roadWinPercent_po=roadWinPercent) %>% tbl_df()
-    regular_season_win_percent_rn <- regular_season_win_percent  %>%  rename(HomeWinPercent_rs=HomeWinPercent, roadWinPercent_rs=roadWinPercent) %>% tbl_df()
+    playoff_win_percent_rn <- playoff_win_percent  %>% 
+                              rename(HomeWinPercent_po=HomeWinPercent, roadWinPercent_po=roadWinPercent) %>% tbl_df()
+
+    regular_season_win_percent_rn <- regular_season_win_percent  %>% 
+                                     rename(HomeWinPercent_rs=HomeWinPercent, roadWinPercent_rs=roadWinPercent) %>% tbl_df()
+
     win_percent_join <- full_join(playoff_win_percent_rn,regular_season_win_percent_rn, by = "teamName") %>% drop_na()
 
-## Contingency table
+## Contingency tables
 
 ### Summary of active and inactive players for the Dallas Stars
 
@@ -720,6 +748,76 @@ currently active and inactive players for the Dallas Stars:
 </table>
 
 Summary of Dallas Stars Players by position and activity
+
+### Table comparing number of shut outs with time spent in the penalty box
+
+The code below categorizes shut outs and penalty minutes
+
+    #categorizing shutouts
+    team_totals <- mutate(team_totals, shut_out_format = 
+                      ifelse(shutouts %in% 0:50, "Not defensive",
+                      ifelse(shutouts %in% 51:100, "Slightly defensive",
+                      ifelse(shutouts %in% 101:150, "Defensive", 
+                      ifelse(shutouts >150, "Very defensive", "")))))
+    team_totals$shut_out_format <- factor(team_totals$shut_out_format, levels=c("Not defensive", "Slightly defensive", "Defensive","Very defensive"))
+
+    #categorizing penalty minutes
+    team_totals <- mutate(team_totals, penalty_mins_format = 
+                      ifelse(penaltyMinutes %in% 0:25000, "Not aggressive",
+                      ifelse(penaltyMinutes %in% 25001:50000, "Slightly aggressive",
+                      ifelse(penaltyMinutes %in% 50001:75000, "Aggressive",
+                      ifelse(penaltyMinutes >75000, "Very aggressive", "")))))
+    team_totals$penalty_mins_format <- factor(team_totals$penalty_mins_format, levels=c("Not aggressive","Slightly aggressive", "Aggressive","Very aggressive"))
+
+    shutouts_penaltyminutes_table <- table(team_totals$shut_out_format, team_totals$penalty_mins_format )
+    kable(shutouts_penaltyminutes_table, caption="Table of Total Number of Shut Outs vs. Total Penalty Minutes")
+
+<table>
+<caption>Table of Total Number of Shut Outs vs. Total Penalty Minutes</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">Not aggressive</th>
+<th style="text-align: right;">Slightly aggressive</th>
+<th style="text-align: right;">Aggressive</th>
+<th style="text-align: right;">Very aggressive</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Not defensive</td>
+<td style="text-align: right;">67</td>
+<td style="text-align: right;">3</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Slightly defensive</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Defensive</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Very defensive</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">7</td>
+</tr>
+</tbody>
+</table>
+
+Table of Total Number of Shut Outs vs. Total Penalty Minutes
+
+It appears being aggressive leads to defensive solidity.
 
 ## Numerical Summaries
 
@@ -785,7 +883,7 @@ regular season do as well during the playoffs.
       geom_abline(slope=1, intercept = 0, color="blue")+
       labs(x="Playoff Home Wins", y="Regular Season Home Wins", title="Scatter of Regular Season vs Playoffs Home Wins")
 
-![](Figs/unnamed-chunk-19-1.png)
+![](Figs/unnamed-chunk-64-1.png)
 
 The boxplot below is a visual representation of the numerical summaries
 table for penalty minutes shown earlier. This also shows
@@ -798,7 +896,7 @@ that,unsurprisingly, centers spend the least time in the penalty box.
       geom_jitter()+
       labs(x="Position", y="Average Penalty Minutes Per Game", fill="Position", title = "Boxplot of Average Penalty Minutes by Position for the Dallas Stars")
 
-![](Figs/unnamed-chunk-20-1.png)
+![](Figs/unnamed-chunk-65-1.png)
 
 The bar plot below show the goals scored by position by the Dallas Stars
 team. The centers clearly score the most goals for the Dallas Stars.
@@ -807,7 +905,18 @@ team. The centers clearly score the most goals for the Dallas Stars.
       geom_bar(stat = "identity", aes(fill=positionCode))+
       labs(x="Position", y="Points", fill="Position", title="Points scored by position for the Dallas Stars")
 
-![](Figs/unnamed-chunk-21-1.png)
+![](Figs/unnamed-chunk-66-1.png)
+
+The bar plot below shows that teams that are very aggressive, also tend
+to have very good defensive solidity.
+
+    ggplot(data=team_totals, aes(x=team_totals$penalty_mins_format))+
+      geom_bar(aes(fill=as.factor(team_totals$shut_out_format)))+ 
+      labs(x="Team Aggression", title="Points scored by position for the Dallas Stars")+ 
+      scale_fill_discrete(name="Defensive Solidity", labels=c("Not defensive", "Slightly defensive", "Defensive","Very defensive")) + 
+      coord_flip()
+
+![](Figs/unnamed-chunk-67-1.png)
 
 The home win percent vs road win percent shown in an earlier table are
 visualized in the scatterplot below. It seems home advantage counts for
@@ -818,7 +927,7 @@ little..
       geom_abline(slope=1, intercept = 0, color="green")+
       labs(x="Road Wins %", y="Home Wins %", title="Scatterplot of Away vs Home Wins Percentages")
 
-![](Figs/unnamed-chunk-22-1.png)
+![](Figs/unnamed-chunk-68-1.png)
 
 The histogram below shows the distribution of seasons spent by position
 for the Dallas Stars.The majority of players spent less than 5 seasons,
@@ -829,4 +938,4 @@ but it seems defenders tend to spend longer at the Dallas Stars.
       facet_wrap(~positionCode)+
       labs(x="Seasons", y="Count", title = "Distribution of seasons by Position for the Dallas Stars", fill="Active Player")
 
-![](Figs/unnamed-chunk-23-1.png)
+![](Figs/unnamed-chunk-69-1.png)
